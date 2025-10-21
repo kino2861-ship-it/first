@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>レジ入金計算</title>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 10px;
+      background: #f8f9fa;
+    }
+
+    h2 {
+      margin-top: 20px;
+      color: #333;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 700px;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px;
+      text-align: center;
+    }
+
+    th {
+      background: #f0f0f0;
+    }
+
+    input[type=number] {
+      width: 70px;
+      text-align: right;
+      font-size: 1em;
+      -moz-appearance: textfield;
+    }
+
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    td.auto {
+      background: #fafafa;
+    }
+
+    input.error {
+      background-color: #ffcccc;
+    }
+
+    @media (max-width: 600px) {
+      input[type=number] {
+        width: 60px;
+        height: 36px;
+        font-size: 1em;
+      }
+
+      th, td {
+        padding: 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<h2>レジ入力表</h2>
+<table id="main-table">
+  <thead>
+    <tr>
+      <th>金種</th>
+      <th>総枚数</th>
+      <th>棒金本数</th>
+      <th>レジ残枚数</th>
+      <th>レジ棒本数</th>
+    </tr>
+  </thead>
+  <tbody id="money-table"></tbody>
+  <tfoot>
+    <tr>
+      <th>合計金額</th>
+      <td class="auto" id="allSum" colspan="2">0</td>
+      <td class="auto" id="regiSum" colspan="2">0</td>
+    </tr>
+    <tr>
+      <th>26万過不足</th>
+      <td colspan="4" class="auto" id="gosa">0</td>
+    </tr>
+  </tfoot>
+</table>
+
+<h2>入金確認表</h2>
+<table id="in-table">
+  <thead>
+    <tr>
+      <th>金種</th>
+      <th>入金枚数</th>
+      <th>入金棒本数</th>
+    </tr>
+  </thead>
+  <tbody id="in-money-table"></tbody>
+  <tfoot>
+    <tr>
+      <th>入金合計</th>
+      <td colspan="2" class="auto" id="inSum">0</td>
+    </tr>
+  </tfoot>
+</table>
+
+<script>
+  const yen = [1, 5, 10, 50, 100, 500, 1000, 2000, 5000, 10000];
+
+  const tbody = $("#money-table");
+  const inTbody = $("#in-money-table");
+
+  yen.forEach((value, i) => {
+    // 上の表（入力用）
+    const row = `
+      <tr data-index="${i}">
+        <th>${value.toLocaleString()}円</th>
+        <td><input type="number" class="all" value="0" min="0"></td>
+        <td><input type="number" class="allSti" value="0" min="0"></td>
+        <td><input type="number" class="regi" value="0" min="0"></td>
+        <td><input type="number" class="regiSti" value="0" min="0"></td>
+      </tr>`;
+    tbody.append(row);
+
+    // 下の表（入金用）
+    const inRow = `
+      <tr data-index="${i}">
+        <th>${value.toLocaleString()}円</th>
+        <td class="auto in">0</td>
+        <td class="auto inSti">0</td>
+      </tr>`;
+    inTbody.append(inRow);
+  });
+
+  $("input").on("input", function () {
+    if (Number($(this).val()) < 0 || $(this).val() === "") {
+      $(this).val(0);
+    }
+    calc();
+  });
+
+  function calc() {
+    let allSum = 0, regiSum = 0, inSum = 0;
+
+    $("#money-table tr").each(function () {
+      const i = $(this).data("index");
+      const all = Number($(this).find(".all").val());
+      const allSti = Number($(this).find(".allSti").val());
+      const regi = Number($(this).find(".regi").val());
+      const regiSti = Number($(this).find(".regiSti").val());
+
+      const inVal = all - regi;
+      const inSti = allSti - regiSti;
+
+      // 入金表に反映
+      const inRow = $(`#in-money-table tr[data-index='${i}']`);
+      inRow.find(".in").text(inVal);
+      inRow.find(".inSti").text(inSti);
+
+      // エラー判定
+      const regiInput = $(this).find(".regi");
+      const regiStiInput = $(this).find(".regiSti");
+      regiInput.toggleClass("error", regi > all);
+      regiStiInput.toggleClass("error", regiSti > allSti);
+
+      // 計算
+      allSum += all * yen[i] + allSti * yen[i] * 50;
+      regiSum += regi * yen[i] + regiSti * yen[i] * 50;
+      inSum += inVal * yen[i] + inSti * yen[i] * 50;
+    });
+
+    const gosa = regiSum - 260000;
+    $("#allSum").text(allSum.toLocaleString());
+    $("#regiSum").text(regiSum.toLocaleString());
+    $("#inSum").text(inSum.toLocaleString());
+    $("#gosa").text(gosa.toLocaleString());
+  }
+
+  calc();
+</script>
+
+</body>
+</html>
