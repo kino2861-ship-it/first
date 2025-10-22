@@ -74,24 +74,13 @@
         });
 
         // 入力ごとに再計算
-        // 入力ごとに再計算
-$(document).on("input", "input", function () {
-    let val = $(this).val();
-
-    // --- ここを追加：先頭の0を削除 ---
-    if (/^0\d+/.test(val)) {
-        val = val.replace(/^0+/, "");
-        if (val === "") val = "0"; // 全部0だった場合
-        $(this).val(val);
-    }
-
-    // --- 既存の処理 ---
-    if (Number(val) < 0 || val === "") {
-        $(this).val(0);
-    }
-
-    calc();
-});
+        $(document).on("input", "input", function () {
+            // 負の値や空は0に
+            if (Number($(this).val()) < 0 || $(this).val() === "") {
+                $(this).val(0);
+            }
+            calc();
+        });
 
         // Enterキーで「次の行の同じ列」に移動
         $("table").on("keydown", "input", function (e) {
