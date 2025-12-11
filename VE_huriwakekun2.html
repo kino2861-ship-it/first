@@ -221,6 +221,13 @@
             }
         });
 
+        // 入力欄フォーカス時に全選択
+        document.addEventListener("focus", function (e) {
+            if (e.target.type === "number") {
+                e.target.select();
+            }
+        }, true);
+
         // Enterキーで「次の行の同じ列」に移動
         document.addEventListener("keydown", function (e) {
             if (e.target.tagName === "INPUT" && e.key === "Enter") {
