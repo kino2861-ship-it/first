@@ -9,32 +9,40 @@
 
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: sans-serif;
-            margin: 20px;
+            margin: 10px;
+            padding: 0;
         }
 
         table {
             border-collapse: collapse;
             width: 100%;
-            max-width: 850px;
+            max-width: 100%;
+            font-size: 14px;
         }
 
         th,
         td {
             border: 1px solid #ccc;
-            padding: 6px;
+            padding: 4px;
             text-align: center;
         }
 
         th {
             background: #f0f0f0;
+            font-size: 12px;
         }
 
         input[type=number] {
-            width: 70px;
+            width: 60px;
+            max-width: 100%;
             text-align: right;
-            font-size: 1em;
+            font-size: 14px;
             -moz-appearance: textfield;
         }
 
@@ -56,7 +64,46 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 4px;
+        }
+
+        /* スマホ対応 */
+        @media (max-width: 768px) {
+            body {
+                margin: 5px;
+            }
+            
+            h2 {
+                font-size: 18px;
+                margin: 10px 0;
+            }
+            
+            table {
+                font-size: 11px;
+            }
+            
+            th {
+                font-size: 10px;
+                padding: 3px 2px;
+            }
+            
+            td {
+                padding: 3px 2px;
+            }
+            
+            input[type=number] {
+                width: 50px;
+                font-size: 12px;
+                padding: 2px;
+            }
+            
+            input[type=checkbox] {
+                transform: scale(0.9);
+            }
+            
+            .checkbox-cell {
+                gap: 2px;
+            }
         }
     </style>
 </head>
@@ -274,6 +321,4 @@
     </script>
 </body>
 
-
 </html>
-
