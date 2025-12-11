@@ -67,40 +67,59 @@
             gap: 4px;
         }
 
+        .preset-button {
+            margin: 15px 0;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .preset-button:hover {
+            background-color: #45a049;
+        }
+
+        .preset-button:active {
+            background-color: #3d8b40;
+        }
+
         /* スマホ対応 */
         @media (max-width: 768px) {
             body {
                 margin: 5px;
             }
-            
+
             h2 {
                 font-size: 18px;
                 margin: 10px 0;
             }
-            
+
             table {
                 font-size: 11px;
             }
-            
+
             th {
                 font-size: 10px;
                 padding: 3px 2px;
             }
-            
+
             td {
                 padding: 3px 2px;
             }
-            
+
             input[type=number] {
                 width: 50px;
                 font-size: 12px;
                 padding: 2px;
             }
-            
+
             input[type=checkbox] {
                 transform: scale(0.9);
             }
-            
+
             .checkbox-cell {
                 gap: 2px;
             }
@@ -111,8 +130,8 @@
 <body>
     <h2>レジ金ふりわけくん</h2>
 
-    <h3>入力表</h3>
-    
+    入力表
+
     <table>
         <thead>
             <tr>
@@ -140,9 +159,12 @@
         </tfoot>
     </table>
 
-<br><br>
+    <button class="preset-button" onclick="applyPreset()">プリセット</button>
+    <button class="preset-button" onclick="debugFill()" style="background-color: #ff9800;">デバッグ</button>
 
-<h3>確認表</h3>
+    <br><br>
+
+    確認表
     <table>
         <thead>
             <tr>
@@ -197,7 +219,7 @@
     ${hasStick ? `<td class="auto regiSti"><div class="checkbox-cell"><span>0</span><input type="checkbox"></div></td>` : `<td class="auto">-</td>`}
     <td class="auto in"><div class="checkbox-cell"><span>0</span><input type="checkbox"></div></td>
     ${hasStick ? `<td class="auto inSti"><div class="checkbox-cell"><span>0</span><input type="checkbox"></div></td>` :
-    `<td class="auto">-</td>`}`;
+                    `<td class="auto">-</td>`}`;
             row.innerHTML = html;
             tbody2.appendChild(row);
         });
@@ -303,7 +325,7 @@
                     const regiStiCell = tr2.querySelector(".regiSti");
                     const inCell = tr2.querySelector(".in span");
                     const inStiCell = tr2.querySelector(".inSti");
-                    
+
                     if (regiCell) regiCell.textContent = regi;
                     if (regiStiCell && !regiStiCell.textContent.includes("-")) {
                         const regiStiSpan = regiStiCell.querySelector("span");
@@ -323,6 +345,94 @@
             document.getElementById("regiSum").textContent = regiSum.toLocaleString();
             document.getElementById("inSum").textContent = inSum.toLocaleString();
             document.getElementById("gosa").textContent = gosa.toLocaleString();
+        }
+
+        // プリセット機能（お札と硬貨）
+        function applyPreset() {
+            const rows = tbody.querySelectorAll("tr");
+            rows.forEach(function (tr) {
+                const thText = tr.querySelector("th").textContent;
+                const value = Number(thText.replace(/[,円\s]/g, "")) || 0;
+                
+                const allInput = tr.querySelector(".all");
+                const regiInput = tr.querySelector(".regi");
+                const allStiInput = tr.querySelector(".allSti");
+                const regiStiInput = tr.querySelector(".regiSti");
+                
+                const all = Number(allInput.value || 0);
+                const allSti = allStiInput ? Number(allStiInput.value || 0) : 0;
+                
+                // お札の処理
+                if (value >= 1000) {
+                    if (value === 10000) {
+                        // 10000円は0枚
+                        regiInput.value = 0;
+                    } else if (value === 5000) {
+                        // 5000円は総枚数と同じだが20枚が上限
+                        regiInput.value = Math.min(all, 20);
+                    } else if (value === 2000) {
+                        // 2000円は0枚
+                        regiInput.value = 0;
+                    } else if (value === 1000) {
+                        // 1000円は総枚数と同じだが35枚が上限
+                        regiInput.value = Math.min(all, 35);
+                    }
+                } 
+                // 硬貨の処理
+                else {
+                    if (value === 500 || value === 50) {
+                        // 500円、50円：レジ棒本数は4本（総棒金本数が4本未満の場合はあるだけ）
+                        if (allSti >= 4) {
+                            regiInput.value = 0;
+                            if (regiStiInput) {
+                                regiStiInput.value = 4;
+                            }
+                        } else {
+                            // 総棒金本数が4本未満の場合
+                            regiInput.value = all;
+                            if (regiStiInput) {
+                                regiStiInput.value = allSti;
+                            }
+                        }
+                    } else if (value === 5 || value === 1) {
+                        // 5円、1円：レジ金枚数は0、レジ棒本数は総棒金本数
+                        regiInput.value = 0;
+                        if (regiStiInput) {
+                            regiStiInput.value = allSti;
+                        }
+                    } else if (value === 100 || value === 10) {
+                        // 100円、10円：レジ棒本数は4本（総棒金本数が4本未満の場合はあるだけ）
+                        if (allSti >= 4) {
+                            regiInput.value = 0;
+                            if (regiStiInput) {
+                                regiStiInput.value = 4;
+                            }
+                        } else {
+                            // 総棒金本数が4本未満の場合
+                            regiInput.value = all;
+                            if (regiStiInput) {
+                                regiStiInput.value = allSti;
+                            }
+                        }
+                    }
+                }
+            });
+            calc();
+        }
+
+        // デバッグ用関数（総枚数をすべて55、総棒金本数をすべて6に設定）
+        function debugFill() {
+            const rows = tbody.querySelectorAll("tr");
+            rows.forEach(function (tr) {
+                const allInput = tr.querySelector(".all");
+                const allStiInput = tr.querySelector(".allSti");
+                
+                allInput.value = 55;
+                if (allStiInput) {
+                    allStiInput.value = 6;
+                }
+            });
+            calc();
         }
 
         // 初回計算
