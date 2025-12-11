@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>レジ入金計算</title>
+
+
+
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 850px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 6px;
+            text-align: center;
+        }
+
+        th {
+            background: #f0f0f0;
+        }
+
+        input[type=number] {
+            width: 70px;
+            text-align: right;
+            font-size: 1em;
+            -moz-appearance: textfield;
+        }
+
+        input[type=number]::-webkit-outer-spin-button,
+        input[type=number]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        td.auto {
+            background: #fafafa;
+        }
+
+        input.error {
+            background-color: #ffcccc;
+        }
+
+        .checkbox-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>レジ金ふりわけくん</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>金種</th>
+                <th>総枚数</th>
+                <th>総棒金本数</th>
+                <th>レジ残枚数</th>
+                <th>レジ棒本数</th>
+                <th>入金枚数</th>
+                <th>入金棒本数</th>
+            </tr>
+        </thead>
+        <tbody id="money-table"></tbody>
+        <tfoot>
+            <tr>
+                <th>合計金額</th>
+                <td class="auto" id="allSum" colspan="2">0</td>
+                <td class="auto" id="regiSum" colspan="2">0</td>
+                <td class="auto" id="inSum" colspan="2">0</td>
+            </tr>
+            <tr>
+                <th>レジ金過不足（26万との差）</th>
+                <td colspan="6" class="auto" id="gosa">0</td>
+            </tr>
+        </tfoot>
+    </table>
+
+<br><br>
+
+<h3>確認表</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>金種</th>
+                <th>レジ残枚数</th>
+                <th>レジ棒本数</th>
+                <th>入金枚数</th>
+                <th>入金棒本数</th>
+            </tr>
+        </thead>
+        <tbody id="money-table2"></tbody>
+    </table>
+
+
+
+
+    <script>
+        // 明示的に降順にする（確実に逆順表示）
+        const yen = [10000, 5000, 2000, 1000, 500, 100, 50, 10, 5, 1];
+
+        const tbody = document.getElementById("money-table");
+
+        // 表の生成
+        yen.forEach((value, i) => {
+            const hasStick = value < 1000; // 棒金欄（コインのみ）
+            const row = document.createElement("tr");
+            row.setAttribute("data-index", i);
+
+            let html = `
+  <th>${value.toLocaleString()}円</th>
+  <td><input type="number" class="all" value="0" min="0"></td>
+  ${hasStick ? `<td><input type="number" class="allSti" value="0" min="0"></td>` : `<td class="auto">-</td>`}
+  <td><input type="number" class="regi" value="0" min="0"></td>
+  ${hasStick ? `<td><input type="number" class="regiSti" value="0" min="0"></td>` : `<td class="auto">-</td>`}
+  <td class="auto in">0</td>
+  <td class="auto inSti">0</td>`;
+            row.innerHTML = html;
+            tbody.appendChild(row);
+        });
+
+
+        //表2の生成、値は上の表と同じ値、入力編集はこちらからはできないが、上の値を編集したら
+
+        const tbody2 = document.getElementById("money-table2");
+        yen.forEach((value, i) => {
+            const hasStick = value < 1000; // 棒金欄（コインのみ）
+            const row = document.createElement("tr");
+            row.setAttribute("data-index", i);
+            let html = `
+  <th>${value.toLocaleString()}円</th>
+    <td class="auto regi"><div class="checkbox-cell"><span>0</span><input type="checkbox"></div></td>
+    ${hasStick ? `<td class="auto regiSti"><div class="checkbox-cell"><span>0</span><input type="checkbox"></div></td>` : `<td class="auto">-</td>`}
+    <td class="auto in"><div class="checkbox-cell"><span>0</span><input type="checkbox"></div></td>
+    ${hasStick ? `<td class="auto inSti"><div class="checkbox-cell"><span>0</span><input type="checkbox"></div></td>` :
+    `<td class="auto">-</td>`}`;
+            row.innerHTML = html;
+            tbody2.appendChild(row);
+        });
+
+
+
+
+
+
+
+
+
+        // 入力ごとに再計算
+        document.addEventListener("input", function (e) {
+            if (e.target.tagName === "INPUT") {
+                // 負の値や空は0に
+                if (Number(e.target.value) < 0 || e.target.value === "") {
+                    e.target.value = 0;
+                }
+                calc();
+            }
+        });
+
+        // Enterキーで「次の行の同じ列」に移動
+        document.addEventListener("keydown", function (e) {
+            if (e.target.tagName === "INPUT" && e.key === "Enter") {
+                e.preventDefault();
+                const currentInput = e.target;
+                const currentTd = currentInput.closest("td");
+                const currentRow = currentTd.closest("tr");
+                const currentColIndex = Array.from(currentRow.children).indexOf(currentTd);
+
+                const nextRow = currentRow.nextElementSibling;
+                if (nextRow) {
+                    const nextTd = nextRow.children[currentColIndex];
+                    if (nextTd) {
+                        const nextInput = nextTd.querySelector("input");
+                        if (nextInput) {
+                            nextInput.focus();
+                            nextInput.select();
+                        }
+                    }
+                }
+            }
+        });
+
+        // 計算処理
+        function calc() {
+            let allSum = 0, regiSum = 0, inSum = 0;
+
+            const rows = tbody.querySelectorAll("tr");
+            rows.forEach(function (tr, index) {
+                // 行の表示テキスト（例 "10,000円"）から数値を取得
+                const thText = tr.querySelector("th").textContent;
+                const value = Number(thText.replace(/[,円\s]/g, "")) || 0;
+
+                const all = Number(tr.querySelector(".all").value || 0);
+                const regi = Number(tr.querySelector(".regi").value || 0);
+
+                const allStiEl = tr.querySelector(".allSti");
+                const regiStiEl = tr.querySelector(".regiSti");
+                const allSti = allStiEl ? Number(allStiEl.value || 0) : 0;
+                const regiSti = regiStiEl ? Number(regiStiEl.value || 0) : 0;
+
+                const inVal = all - regi;
+                const inSti = allSti - regiSti;
+
+                // エラー表示
+                const regiInput = tr.querySelector(".regi");
+                if (regi > all) {
+                    regiInput.classList.add("error");
+                } else {
+                    regiInput.classList.remove("error");
+                }
+
+                if (regiStiEl) {
+                    if (regiSti > allSti) {
+                        regiStiEl.classList.add("error");
+                    } else {
+                        regiStiEl.classList.remove("error");
+                    }
+                }
+
+                tr.querySelector(".in").textContent = inVal;
+                tr.querySelector(".inSti").textContent = inSti;
+
+                // 合計計算（棒金は50枚分の扱い）
+                allSum += all * value + allSti * value * 50;
+                regiSum += regi * value + regiSti * value * 50;
+                inSum += inVal * value + inSti * value * 50;
+
+                // 表2に値を反映
+                const tr2 = tbody2.querySelectorAll("tr")[index];
+                if (tr2) {
+                    const regiCell = tr2.querySelector(".regi span");
+                    const regiStiCell = tr2.querySelector(".regiSti");
+                    const inCell = tr2.querySelector(".in span");
+                    const inStiCell = tr2.querySelector(".inSti");
+                    
+                    if (regiCell) regiCell.textContent = regi;
+                    if (regiStiCell && !regiStiCell.textContent.includes("-")) {
+                        const regiStiSpan = regiStiCell.querySelector("span");
+                        if (regiStiSpan) regiStiSpan.textContent = regiSti;
+                    }
+                    if (inCell) inCell.textContent = inVal;
+                    if (inStiCell && !inStiCell.textContent.includes("-")) {
+                        const inStiSpan = inStiCell.querySelector("span");
+                        if (inStiSpan) inStiSpan.textContent = inSti;
+                    }
+                }
+            });
+
+            const gosa = regiSum - 260000;
+
+            document.getElementById("allSum").textContent = allSum.toLocaleString();
+            document.getElementById("regiSum").textContent = regiSum.toLocaleString();
+            document.getElementById("inSum").textContent = inSum.toLocaleString();
+            document.getElementById("gosa").textContent = gosa.toLocaleString();
+        }
+
+        // 初回計算
+        calc();
+    </script>
+</body>
+
+</html>
