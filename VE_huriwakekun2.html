@@ -4,134 +4,503 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>レジ金ふりわけくんの使い方</title>
+    <title>レジ入金計算</title>
+
+
+
     <style>
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.8;
-            color: #333;
-            background-color: #f9f9f9;
-            padding: 40px 20px;
-        }
-
-        h2 {
-            font-size: 28px;
-            color: #2c3e50;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid #3498db;
-            display: inline-block;
-        }
-
-        p {
-            text-indent: 1em;
-            margin-bottom: 15px;
-            font-size: 15px;
-            line-height: 1.9;
-        }
-
-        br {
-            line-height: 2;
+            font-family: sans-serif;
+            margin: 10px;
+            padding: 0;
         }
 
         table {
             border-collapse: collapse;
             width: 100%;
-            max-width: 600px;
-            margin: 20px 0;
-            background-color: #fff;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        td {
-            border: 1px solid #ddd;
-            padding: 14px 16px;
-            text-align: center;
+            max-width: 100%;
             font-size: 14px;
         }
 
-        tr:nth-child(odd) {
-            background-color: #f5f5f5;
+        th,
+        td {
+            border: 1px solid #c69961;
+            padding: 4px;
+            text-align: center;
         }
 
-        tr:hover {
-            background-color: #e8f4f8;
+        th {
+            background: #feead5;
+            font-size: 12px;
+        }
+
+        input[type=number] {
+            width: 60px;
+            max-width: 100%;
+            text-align: right;
+            font-size: 14px;
+            -moz-appearance: textfield;
+        }
+
+        input[type=number]::-webkit-outer-spin-button,
+        input[type=number]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        td.auto {
+            background: #fafafa;
+        }
+
+        input.error {
+            background-color: #ffcccc;
+        }
+
+        .checkbox-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .preset-button {
+            margin: 15px 0;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .preset-button:hover {
+            background-color: #45a049;
+        }
+
+        .preset-button:active {
+            background-color: #3d8b40;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        /* スマホ対応 */
+        @media (max-width: 768px) {
+            body {
+                margin: 5px;
+            }
+
+            h2 {
+                font-size: 18px;
+                margin: 10px 0;
+            }
+
+            table {
+                font-size: 11px;
+            }
+
+            th {
+                font-size: 10px;
+                padding: 3px 2px;
+            }
+
+            td {
+                padding: 3px 2px;
+            }
+
+            input[type=number] {
+                width: 50px;
+                font-size: 12px;
+                padding: 2px;
+            }
+
+            input[type=checkbox] {
+                transform: scale(0.9);
+            }
+
+            .checkbox-cell {
+                gap: 2px;
+            }
         }
     </style>
 </head>
 
 <body>
-    <h2>~使い方~</h2>
-    <p>レジ金ふりわけくんは締め作業時のレジ締め周りの計算を行うツールです！✌️<br>
-        前のレジの振り分け画面に寄せているので勘で使えると思いますが、一応使い方をメモしておきます📝<br>
-        ぼーっと書いてたら長くなっちゃったので、必要なさそうなところは読み飛ばしてください🫠<br><br>
+    <h2>レジ金ふりわけくん</h2>
 
-    <h3>1,入金表の使い方</h3><br>
-    <p>まず、総枚数、総棒金本数という項目にレジにあるお金と棒金の数を入力します。<br>
-        <p>iphoneだと確定キーで下、上のほうにある「^」←こんな感じのキーで左右のタブに移動できる、はずです。多分。<br>
-            <img src="images_huriwake/huriwake_gazou1.jpg" alt="キーボード説明画像" width="300"><br>
-    <p>次にレジ残枚数、レジ棒本数という項目に翌日レジに残す（金庫に入れる）お金の数を入力します🤳<br>
-        (レジ金過不足という項目に26万円との誤差を表示しているので参考にしてください！)<br>
-    <p>入金枚数、入金棒本数という項目には入金バッグに入れるお金（レジにあるお金とレジに残すお金の差）の数を自動計算して表示しています。<br>
-    <p>合計金額も表示しているので、レジに表示されている合計金額と一致しているかの確認に使ってください！<br>
-    <p>入力ボックスが赤くなっているときは、翌日レジに残すお金がレジにあるお金を上回ってしまっているので修正してください⚠️<br>
-        <img src="images_huriwake/huriwake_gazou2.jpg" alt="入力ボックス画像" width="300"><br>
-    <p>なお、今のところセーブ機能などはつけていないので、入力内容はページをリロードすると消えてしまいます😢<br>
-        振り分けが終わったら念のためスクショしておくことを強くお勧めします！<br><br>
+    入力表
 
-
-    <h3>2,自動入力ボタンの使い方</h3><br>
-    <p>プリセット、リセット、デバックという3つのボタンがあります！<br>
-        <br>
-    <p>プリセットボタンはレジ残枚数、レジ棒本数の入力を途中まで行うボタンです。<br>
-        総枚数と総棒金本数を入力した後に押すと、以下のように値を自動入力します。<br>
-        <br>
     <table>
-        <td>10000円/2000円</td>
-        <td>0枚</td>
-        </tr>
-        <tr>
-            <td>5000円</td>
-            <td>20枚、足りなければある分だけ</td>
-        </tr>
-        <tr>
-            <td>1000円</td>
-            <td>35枚、足りなければある分だけ</td>
-        </tr>
-        <tr>
-            <td>500円～10円</td>
-            <td>棒金4本、足りなければある分だけ</td>
-        </tr>
-        <tr>
-            <td>5円/1円</td>
-            <td>棒金あるだけ</td>
-        </tr>
+        <thead>
+            <tr>
+                <th>金種</th>
+                <th>総枚数</th>
+                <th>総棒金本数</th>
+                <th>レジ残枚数</th>
+                <th>レジ棒本数</th>
+                <th>入金枚数</th>
+                <th>入金棒本数</th>
+            </tr>
+        </thead>
+        <tbody id="money-table"></tbody>
+        <tfoot>
+            <tr>
+                <th>合計金額</th>
+                <td class="auto" id="allSum" colspan="2">0</td>
+                <td class="auto" id="regiSum" colspan="2">0</td>
+                <td class="auto" id="inSum" colspan="2">0</td>
+            </tr>
+            <tr>
+                <th>レジ金過不足（26万との差）</th>
+                <td colspan="6" class="auto" id="gosa">0</td>
+            </tr>
+        </tfoot>
     </table>
-    <br>
-    <p>初めの仮入力作業が面倒なときに使ってみてください🤩<br>
-        26万円に揃えるボタンではないので、押した後は手動で調整してください😭<br>
 
-    <p>リセットボタンはすべての入力値をリセットして0にするボタンです!<br>
-        デバッグボタンはデバッグ作業用のボタンなので使うときは気にしないでください！🙏<br>
-        <br>
-    <p>どのボタンも一応、押す前に確認アラートが出るようになっているので誤タップしても大丈夫です😎<br><br>
+    <button class="preset-button" onclick="confirmPreset()">プリセット</button>
+    <button class="preset-button" onclick="confirmReset()" style="background-color: #2196F3;">リセット</button>
+    <button class="preset-button" onclick="debugConfirm()" style="background-color: #ff9800;">デバッグ</button>
 
-    <h3>3,確認表について</h3><br>
-    <p>金庫と入金バッグに入れたお金をチェックボックスで確認できる表です！<br>
-        特に重要な機能ではないのですが、心配性の方はレシートにチェックをつけながら確認する要領で使ってください✅<br><br>
-    <p>自分のスマホでしか動作確認できていないので、うまく動かなかったり、使いづらい部分があったらぜひ教えてください！<br>
-        以上です！あざした😭</p>
-    <br><br><br>
-    <a href="https://kino2861-ship-it.github.io/first/VE_huriwakekun2.html" target="_blank">レジ金ふりわけくん</a>
+    <br><br>
+
+    確認表
+    <table>
+        <thead>
+            <tr>
+                <th>金種</th>
+                <th>レジ残枚数</th>
+                <th>レジ棒本数</th>
+                <th>入金枚数</th>
+                <th>入金棒本数</th>
+            </tr>
+        </thead>
+        <tbody id="money-table2"></tbody>
+    </table>
+
+
+
+
+    <script>
+        // 明示的に降順にする（確実に逆順表示）
+        const yen = [10000, 5000, 2000, 1000, 500, 100, 50, 10, 5, 1];
+
+        const tbody = document.getElementById("money-table");
+
+        // 表の生成
+        yen.forEach((value, i) => {
+            const hasStick = value < 1000; // 棒金欄（コインのみ）
+            const row = document.createElement("tr");
+            row.setAttribute("data-index", i);
+
+            let html = `
+  <th>${value.toLocaleString()}円</th>
+  <td><input type="number" class="all" value="0" min="0"></td>
+  ${hasStick ? `<td><input type="number" class="allSti" value="0" min="0"></td>` : `<td class="auto">-</td>`}
+  <td><input type="number" class="regi" value="0" min="0"></td>
+  ${hasStick ? `<td><input type="number" class="regiSti" value="0" min="0"></td>` : `<td class="auto">-</td>`}
+  <td class="auto in">0</td>
+  <td class="auto inSti">0</td>`;
+            row.innerHTML = html;
+            tbody.appendChild(row);
+        });
+
+
+        //表2の生成、値は上の表と同じ値、入力編集はこちらからはできないが、上の値を編集したら
+
+        const tbody2 = document.getElementById("money-table2");
+        yen.forEach((value, i) => {
+            const hasStick = value < 1000; // 棒金欄（コインのみ）
+            const row = document.createElement("tr");
+            row.setAttribute("data-index", i);
+            let html = `
+  <th>${value.toLocaleString()}円</th>
+    <td class="auto regi"><div class="checkbox-cell"><span>0</span><input type="checkbox"></div></td>
+    ${hasStick ? `<td class="auto regiSti"><div class="checkbox-cell"><span>0</span><input type="checkbox"></div></td>` : `<td class="auto">-</td>`}
+    <td class="auto in"><div class="checkbox-cell"><span>0</span><input type="checkbox"></div></td>
+    ${hasStick ? `<td class="auto inSti"><div class="checkbox-cell"><span>0</span><input type="checkbox"></div></td>` :
+                    `<td class="auto">-</td>`}`;
+            row.innerHTML = html;
+            tbody2.appendChild(row);
+        });
+
+
+
+
+
+
+
+
+
+        // 入力ごとに再計算
+        document.addEventListener("input", function (e) {
+            if (e.target.tagName === "INPUT") {
+                // 負の値や空は0に
+                if (Number(e.target.value) < 0 || e.target.value === "") {
+                    e.target.value = 0;
+                }
+                calc();
+            }
+        });
+
+        // 入力欄フォーカス時に全選択
+        document.addEventListener("focus", function (e) {
+            if (e.target.type === "number") {
+                e.target.select();
+            }
+        }, true);
+
+        // Enterキーで「次の行の同じ列」に移動
+        document.addEventListener("keydown", function (e) {
+            if (e.target.tagName === "INPUT" && e.key === "Enter") {
+                e.preventDefault();
+                const currentInput = e.target;
+                const currentTd = currentInput.closest("td");
+                const currentRow = currentTd.closest("tr");
+                const currentColIndex = Array.from(currentRow.children).indexOf(currentTd);
+
+                const nextRow = currentRow.nextElementSibling;
+                if (nextRow) {
+                    const nextTd = nextRow.children[currentColIndex];
+                    if (nextTd) {
+                        const nextInput = nextTd.querySelector("input");
+                        if (nextInput) {
+                            nextInput.focus();
+                            nextInput.select();
+                        }
+                    }
+                }
+            }
+        });
+
+        // 計算処理
+        function calc() {
+            let allSum = 0, regiSum = 0, inSum = 0;
+
+            const rows = tbody.querySelectorAll("tr");
+            rows.forEach(function (tr, index) {
+                // 行の表示テキスト（例 "10,000円"）から数値を取得
+                const thText = tr.querySelector("th").textContent;
+                const value = Number(thText.replace(/[,円\s]/g, "")) || 0;
+
+                const all = Number(tr.querySelector(".all").value || 0);
+                const regi = Number(tr.querySelector(".regi").value || 0);
+
+                const allStiEl = tr.querySelector(".allSti");
+                const regiStiEl = tr.querySelector(".regiSti");
+                const allSti = allStiEl ? Number(allStiEl.value || 0) : 0;
+                const regiSti = regiStiEl ? Number(regiStiEl.value || 0) : 0;
+
+                const inVal = all - regi;
+                const inSti = allSti - regiSti;
+
+                // エラー表示
+                const regiInput = tr.querySelector(".regi");
+                if (regi > all) {
+                    regiInput.classList.add("error");
+                } else {
+                    regiInput.classList.remove("error");
+                }
+
+                if (regiStiEl) {
+                    if (regiSti > allSti) {
+                        regiStiEl.classList.add("error");
+                    } else {
+                        regiStiEl.classList.remove("error");
+                    }
+                }
+
+                tr.querySelector(".in").textContent = inVal;
+                tr.querySelector(".inSti").textContent = inSti;
+
+                // 合計計算（棒金は50枚分の扱い）
+                allSum += all * value + allSti * value * 50;
+                regiSum += regi * value + regiSti * value * 50;
+                inSum += inVal * value + inSti * value * 50;
+
+                // 表2に値を反映
+                const tr2 = tbody2.querySelectorAll("tr")[index];
+                if (tr2) {
+                    // レジ残枚数
+                    const regiCell = tr2.querySelector(".regi");
+                    if (regiCell) {
+                        const regiSpan = regiCell.querySelector("span");
+                        if (regiSpan) regiSpan.textContent = regi;
+                    }
+                    
+                    // レジ棒本数
+                    const regiStiCell = tr2.querySelector(".regiSti");
+                    if (regiStiCell) {
+                        const regiStiSpan = regiStiCell.querySelector("span");
+                        if (regiStiSpan) regiStiSpan.textContent = regiSti;
+                    }
+                    
+                    // 入金枚数
+                    const inCell = tr2.querySelector(".in");
+                    if (inCell) {
+                        const inSpan = inCell.querySelector("span");
+                        if (inSpan) inSpan.textContent = inVal;
+                    }
+                    
+                    // 入金棒本数
+                    const inStiCell = tr2.querySelector(".inSti");
+                    if (inStiCell) {
+                        const inStiSpan = inStiCell.querySelector("span");
+                        if (inStiSpan) inStiSpan.textContent = inSti;
+                    }
+                }
+            });
+
+            const gosa = regiSum - 260000;
+
+            document.getElementById("allSum").textContent = allSum.toLocaleString();
+            document.getElementById("regiSum").textContent = regiSum.toLocaleString();
+            document.getElementById("inSum").textContent = inSum.toLocaleString();
+            document.getElementById("gosa").textContent = gosa.toLocaleString();
+        }
+
+        // 確認付きプリセット関数
+        function confirmPreset() {
+            if (confirm("プリセットを行うと現在のレジ残金の入力は失われます。\nプリセットを行いますか？")) {
+                applyPreset();
+            }
+        }
+
+        // 確認付きデバック関数
+        function debugConfirm() {
+            if (confirm("デバックのための自動入力を行いますか？")) {
+                debugFill();
+            }
+        }
+
+        // 確認付きリセット関数
+        function confirmReset() {
+            if (confirm("リセットを行うと現在入力しているデータはすべて失われます。\nリセットを行いますか？")) {
+                resetAll();
+            }
+        }
+
+        // リセット処理
+        function resetAll() {
+            const rows = tbody.querySelectorAll("tr");
+            rows.forEach(function (tr) {
+                const allInput = tr.querySelector(".all");
+                const allStiInput = tr.querySelector(".allSti");
+                const regiInput = tr.querySelector(".regi");
+                const regiStiInput = tr.querySelector(".regiSti");
+                
+                allInput.value = 0;
+                if (allStiInput) {
+                    allStiInput.value = 0;
+                }
+                regiInput.value = 0;
+                if (regiStiInput) {
+                    regiStiInput.value = 0;
+                }
+            });
+            calc();
+        }
+
+        // プリセット機能（お札と硬貨）
+        function applyPreset() {
+            const rows = tbody.querySelectorAll("tr");
+            rows.forEach(function (tr) {
+                const thText = tr.querySelector("th").textContent;
+                const value = Number(thText.replace(/[,円\s]/g, "")) || 0;
+                
+                const allInput = tr.querySelector(".all");
+                const regiInput = tr.querySelector(".regi");
+                const allStiInput = tr.querySelector(".allSti");
+                const regiStiInput = tr.querySelector(".regiSti");
+                
+                const all = Number(allInput.value || 0);
+                const allSti = allStiInput ? Number(allStiInput.value || 0) : 0;
+                
+                // お札の処理
+                if (value >= 1000) {
+                    if (value === 10000) {
+                        // 10000円は0枚
+                        regiInput.value = 0;
+                    } else if (value === 5000) {
+                        // 5000円は総枚数と同じだが20枚が上限
+                        regiInput.value = Math.min(all, 20);
+                    } else if (value === 2000) {
+                        // 2000円は0枚
+                        regiInput.value = 0;
+                    } else if (value === 1000) {
+                        // 1000円は総枚数と同じだが35枚が上限
+                        regiInput.value = Math.min(all, 35);
+                    }
+                } 
+                // 硬貨の処理
+                else {
+                    if (value === 500 || value === 50) {
+                        // 500円、50円：レジ棒本数は4本（総棒金本数が4本未満の場合はあるだけ）
+                        if (allSti >= 4) {
+                            regiInput.value = 0;
+                            if (regiStiInput) {
+                                regiStiInput.value = 4;
+                            }
+                        } else {
+                            // 総棒金本数が4本未満の場合
+                            regiInput.value = all;
+                            if (regiStiInput) {
+                                regiStiInput.value = allSti;
+                            }
+                        }
+                    } else if (value === 5 || value === 1) {
+                        // 5円、1円：レジ金枚数は0、レジ棒本数は総棒金本数
+                        regiInput.value = 0;
+                        if (regiStiInput) {
+                            regiStiInput.value = allSti;
+                        }
+                    } else if (value === 100 || value === 10) {
+                        // 100円、10円：レジ棒本数は4本（総棒金本数が4本未満の場合はあるだけ）
+                        if (allSti >= 4) {
+                            regiInput.value = 0;
+                            if (regiStiInput) {
+                                regiStiInput.value = 4;
+                            }
+                        } else {
+                            // 総棒金本数が4本未満の場合
+                            regiInput.value = all;
+                            if (regiStiInput) {
+                                regiStiInput.value = allSti;
+                            }
+                        }
+                    }
+                }
+            });
+            calc();
+        }
+
+        // デバッグ用関数（総枚数をすべて55、総棒金本数をすべて6に設定）
+        function debugFill() {
+            const rows = tbody.querySelectorAll("tr");
+            rows.forEach(function (tr) {
+                const allInput = tr.querySelector(".all");
+                const allStiInput = tr.querySelector(".allSti");
+                
+                allInput.value = 55;
+                if (allStiInput) {
+                    allStiInput.value = 6;
+                }
+            });
+            calc();
+        }
+
+        // 初回計算
+        calc();
+    </script>
+<br><br><br>
+
+
+<a href="https://kino2861-ship-it.github.io/first/huriwakekun_inst.html"target="_blank">使い方</a>
 </body>
-
 
 </html>
