@@ -86,6 +86,10 @@
             background-color: #3d8b40;
         }
 
+        h2 {
+            text-align: center;
+        }
+
         /* スマホ対応 */
         @media (max-width: 768px) {
             body {
@@ -159,8 +163,8 @@
         </tfoot>
     </table>
 
-    <button class="preset-button" onclick="applyPreset()">プリセット</button>
-    <button class="preset-button" onclick="debugFill()" style="background-color: #ff9800;">デバッグ</button>
+    <button class="preset-button" onclick="confirmPreset()">プリセット</button>
+    <button class="preset-button" onclick="debugConfirm()" style="background-color: #ff9800;">デバッグ</button>
 
     <br><br>
 
@@ -345,6 +349,20 @@
             document.getElementById("regiSum").textContent = regiSum.toLocaleString();
             document.getElementById("inSum").textContent = inSum.toLocaleString();
             document.getElementById("gosa").textContent = gosa.toLocaleString();
+        }
+
+        // 確認付きプリセット関数
+        function confirmPreset() {
+            if (confirm("プリセットを行うと現在のレジ残金の入力は失われます。\nプリセットを行いますか？")) {
+                applyPreset();
+            }
+        }
+
+        // 確認付きデバック関数
+        function debugConfirm() {
+            if (confirm("デバックのための自動入力を行いますか？")) {
+                debugFill();
+            }
         }
 
         // プリセット機能（お札と硬貨）
